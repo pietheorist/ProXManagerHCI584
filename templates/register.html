@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Pro X Planner</title>
+<header>
+    <div>
+        <input type="button" onclick="location.href='/'" value="Home">
+    </div>
+</header>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1>Pro X Planner</h1>
+    <h4>Register new client.</h4>
+    <form action="/manager" method="POST">
+        <select class="dropdown1" name="eventtypecontent" id="eventtypecontent" placeholder="Select the event type">
+            <option value="" disabled selected>Select the event type</option>
+            <option id="Event1" value="Wedding">Wedding</option>
+            <option id="Event2" value="Corporate">Corporate</option>
+            <option id="Event3" value="Charity">Charity</option>
+            <option id="Event4" value="School Dance">School Dance</option>
+            <option id="Event5" value="Sorority/Fraternity">Sorority/Fraternity</option>
+            <option id="Event6" value="Other">Other</option>
+        </select>
+        <input type="text" name="firstnamecontent" id="firstnamecontent" placeholder="Client First Name">
+        <input type="text" name="lastnamecontent" id="lastnamecontent" placeholder="Client Last Name">
+        <input type="submit" value="Register Client">
+    </form>
+</div>
+{% endblock %}

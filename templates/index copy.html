@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Pro X Planner</title>
+<header>
+    <div>
+        <input type="button" onclick="location.href='/manager'" value="Manager">
+        <input type="button" onclick="location.href='/client'" value="Client">
+    </div>
+</header>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1>Pro X Planner</h1>
+    {% if tasks|length < 1 %}
+    <h4>There are no tasks. Create one below.</h4>
+    {% else %}
+    <table>
+        <tr>
+            <th>Event Type</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Date Submitted</th>
+            <th>Actions</th>
+        </tr>
+        {% for task in tasks %}
+            <tr>
+                <td>{{ task.event_type }}</td>
+                <td>{{ task.first_name }}</td>
+                <td>{{ task.last_name }}</td>
+                <td>{{ task.date_created.date() }}</td>
+                <td>
+                    <a href="/delete/{{task.id}}">Delete</a>
+                    <br>
+                    <a href="/update/{{task.id}}">Update</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    <form action="/manager" method="POST">
+        <select class="dropdown1" name="eventtypecontent" id="eventtypecontent" placeholder="Select the event type">
+            <option value="" disabled selected>Select the event type</option>
+            <option id="Event1" value="Wedding">Wedding</option>
+            <option id="Event2" value="Corporate">Corporate</option>
+            <option id="Event3" value="Charity">Charity</option>
+            <option id="Event4" value="School Dance">School Dance</option>
+            <option id="Event5" value="Sorority/Fraternity">Sorority/Fraternity</option>
+            <option id="Event6" value="Other">Other</option>
+        </select>
+        <input type="text" name="firstnamecontent" id="firstnamecontent" placeholder="Client First Name">
+        <input type="text" name="lastnamecontent" id="lastnamecontent" placeholder="Client Last Name">
+        <input type="submit" value="Register Client">
+    </form>
+</div>
+{% endblock %}
