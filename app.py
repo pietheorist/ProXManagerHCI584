@@ -1,68 +1,90 @@
-from flask import Flask, Blueprint, render_template, url_for, request, redirect
+from flask import Flask, Blueprint, render_template, url_for, request, redirect, send_file
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import exc
 from datetime import datetime
+import csv
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///manager.db'
 db = SQLAlchemy(app)
 
-class Todo(db.Model):
+class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(200), nullable=False)
+    first_name = db.Column(db.String(20), nullable=False, default='No First Name')
+    last_name = db.Column(db.String(60), nullable=False, default='No Last Name')
+    event_type = db.Column(db.String(80), nullable=False, default='No Event Type')
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return '<Task %r>' % self.id
-
-#@app.route('/login', methods=['GET', 'POST'])
-#def login():
-#    error = None
-#    if request.method == 'POST':
-#        if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-#            error = 'Invalid. Try Again.'
-#        else:
-#            return redirect('/')
-#    return render_template('login.html', error=error)
+    
+@app.before_request
+def create_tables():
+    db.create_all()
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
+        tasks = Client.query.order_by(Client.date_created).all()
+        return render_template('index.html', tasks=tasks)
+
+@app.route('/manager', methods=['POST', 'GET'])
+def manager():
     if request.method == 'POST':
-        task_content = request.form['content']
-        new_task = Todo(content=task_content)
+        clientpulled = request.form.get('clientDropdown')
+        try:
+            return redirect('/manager')
+        except:
+            return 'That didnt work.'
+    else:
+        tasks = Client.query.order_by(Client.date_created).all()
+        return render_template('manager.html', tasks=tasks)
+
+@app.route('/client', methods=['POST', 'GET'])
+def client():
+        tasks = Client.query.order_by(Client.date_created).all()
+        return render_template('client.html', tasks=tasks)
+    
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    if request.method == 'POST':
+        eventtype = request.form['eventtypecontent']
+        firstname = request.form['firstnamecontent']
+        lastname = request.form['lastnamecontent']
+        new_task = Client(event_type=eventtype, first_name=firstname, last_name=lastname)
 
         try:
             db.session.add(new_task)
             db.session.commit()
-            return redirect('/')
+            return redirect('/manager')
         except:
-            return 'There was an issue'
+            return 'There was an issue submitting your information.'
     else:
-        tasks = Todo.query.order_by(Todo.date_created).all()
-        return render_template('index.html', tasks=tasks)
+        tasks = Client.query.order_by(Client.date_created).all()
+        return render_template('register.html', tasks=tasks)
     
 @app.route('/delete/<int:id>')
 def delete(id):
-    task_to_delete = Todo.query.get_or_404(id)
+    task_to_delete = Client.query.get_or_404(id)
 
     try:
         db.session.delete(task_to_delete)
         db.session.commit()
-        return redirect('/')
+        return redirect('/manager')
     except:
-        return 'There was an issue'
+        return 'There was an issue deleting the section.'
     
-@app.route('/update/<int:id>', methods=['GET', 'POST'])
-def update(id):
-    task = Todo.query.get_or_404(id)
+@app.route('/client/<int:id>', methods=['GET', 'POST'])
+def chooseclient(id):
+    task = Client.query.get_or_404(id)
 
     if request.method == 'POST':
-        task.content = request.form['content']
+        task.content = request.form['eventtypecontent']
 
         try:
             db.session.commit()
-            return redirect('/')
+            return redirect('/client/<int:id>')
         except:
-            return 'There was an issue'
+            return 'There was an issue updating the section.'
 
     else:
         return render_template('update.html', task=task)
