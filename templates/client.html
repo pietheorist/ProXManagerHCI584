@@ -52,5 +52,15 @@
         <input type="text" name="lastnamecontent" id="lastnamecontent">
         <input type="submit" value="Add Task">
     </form>
+    <div>
+        <h2>
+            Your Saved Tracks
+        </h2>
+        <ul>
+            {% for track in tracks %}
+                <li>{{ track }}</li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
 {% endblock %}

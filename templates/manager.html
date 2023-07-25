@@ -28,6 +28,10 @@
         </select>
         <input type="submit" value="Load Client Data">
     </form>
-    </form>
+    <ul>
+        {% for task in tasks %}
+            <li>{{ task.first_name }} - {{ task.date_created }}</li>
+        {% endfor %}
+    </ul>
 </div>
 {% endblock %}

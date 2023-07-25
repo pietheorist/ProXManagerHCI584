@@ -2,7 +2,8 @@ from flask import Flask, Blueprint, render_template, url_for, request, redirect,
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc
 from datetime import datetime
-import csv
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///manager.db'
@@ -42,7 +43,14 @@ def manager():
 @app.route('/client', methods=['POST', 'GET'])
 def client():
         tasks = Client.query.order_by(Client.date_created).all()
-        return render_template('client.html', tasks=tasks)
+        sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+        results = sp.current_user_saved_tracks()
+        tracks = []
+        for idx, item in enumerate(results['items']):
+            track = item['track']
+            track_info = f"{idx}: {track['artists'][0]['name']} - {track['name']}"
+            tracks.append(track_info)
+        return render_template('client.html', tasks=tasks, tracks=tracks)
     
 @app.route('/register', methods=['POST', 'GET'])
 def register():
